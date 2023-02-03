@@ -1,0 +1,29 @@
+version: '3.9'
+services:
+  server:
+    env_file:
+      - .env
+    container_name: bath-server
+    image: bath-server
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/home/app
+    command: air ./main.go -b 0.0.0.0
+  database:
+    container_name: bath-database
+    image: postgres:15-alpine
+    ports:
+      - 5432:5432
+    volumes:
+     - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+
+volumes:
+  postgres-data:

@@ -34,7 +34,12 @@ func (uc *userController) SignUp(c *fiber.Ctx) error {
 
 	}
 
-	u, err := uc.userInteractor.Create(signUp.ToUser())
+	user, err := signUp.ToUser()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(err.Error())
+	}
+
+	u, err := uc.userInteractor.Create(user)
 	if !errors.Is(err, nil) {
 		return c.Status(fiber.StatusBadRequest).JSON(err.Error())
 	}

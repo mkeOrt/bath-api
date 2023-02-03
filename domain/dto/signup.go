@@ -1,6 +1,10 @@
 package dto
 
-import "github.com/mkeort/bath-hexagonal/domain/model"
+import (
+	"fmt"
+
+	"github.com/mkeort/bath-hexagonal/domain/model"
+)
 
 type SignUp struct {
 	Name                 string `json:"name" validate:"required"`
@@ -10,11 +14,16 @@ type SignUp struct {
 	PasswordConfirmation string `json:"password-confirmation" validate:"required,eqcsfield=Password"`
 }
 
-func (s *SignUp) ToUser() *model.User {
+func (s *SignUp) ToUser() (*model.User, error) {
+	hash, err := GenerateFromPassword(s.Password)
+	if err != nil {
+		return nil, fmt.Errorf("error encrypting password")
+	}
+
 	return &model.User{
 		Name:     s.Name,
 		Lastname: s.Lastname,
 		Email:    s.Email,
-		Password: s.Password,
-	}
+		Password: hash,
+	}, nil
 }
