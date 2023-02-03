@@ -1,0 +1,9 @@
+FROM golang:1.19.5-alpine
+
+WORKDIR /home/app
+
+RUN go install github.com/cosmtrek/air@latest
+
+COPY . .
+
+RUN go mod tidy

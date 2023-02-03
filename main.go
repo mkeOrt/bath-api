@@ -1,7 +1,6 @@
 package main
 
 import (
-	_ "github.com/joho/godotenv/autoload"
 	"github.com/mkeort/bath-hexagonal/config"
 	"github.com/mkeort/bath-hexagonal/infrastructure/datastore"
 	"github.com/mkeort/bath-hexagonal/infrastructure/router"
