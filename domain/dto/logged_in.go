@@ -2,6 +2,7 @@ package dto
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -20,7 +21,7 @@ func NewLoggedIn(u *model.User) (*LoggedIn, error) {
 		"user_id": u.ID,
 	})
 
-	ss, err := token.SignedString([]byte("dsahfjkbdshakfa"))
+	ss, err := token.SignedString([]byte(os.Getenv("JWT_SECRET_KEY")))
 	if err != nil {
 		return nil, err
 	}

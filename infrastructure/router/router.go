@@ -3,11 +3,11 @@ package router
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/mkeort/bath-hexagonal/interface/controller"
+	"github.com/mkeort/bath-hexagonal/interface/middleware"
 )
 
-func NewRouter(a fiber.Router, c controller.AppController) {
-	users := a.Group("/users")
-
-	users.Post("sign-up", c.User.SignUp)
-	users.Post("log-in", c.User.LogIn)
+func NewRouter(r fiber.Router, c controller.AppController) {
+	middlewares := middleware.NewAppMiddleware()
+	NewUserRouter(r.Group("/users"), c)
+	NewPoopRouter(r.Group("/poops", middlewares.Auth.RequiredAuth), c)
 }
