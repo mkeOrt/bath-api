@@ -12,6 +12,7 @@ type User struct {
 	Lastname string `json:"lastname"`
 	Email    string `json:"email" gorm:"uniqueIndex"`
 	Password string `json:"password"`
+	Poops    []Poop
 }
 
 func NewUser(n, l, e, p string) (*User, error) {

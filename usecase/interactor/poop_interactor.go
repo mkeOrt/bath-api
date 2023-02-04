@@ -1,6 +1,10 @@
 package interactor
 
 import (
+	"errors"
+
+	"github.com/mkeort/bath-hexagonal/domain/dto"
+	"github.com/mkeort/bath-hexagonal/domain/model"
 	"github.com/mkeort/bath-hexagonal/usecase/presenter"
 	"github.com/mkeort/bath-hexagonal/usecase/repository"
 )
@@ -12,8 +16,26 @@ type poopInteractor struct {
 }
 
 type PoopInteractor interface {
+	Create(p *model.Poop) (*dto.PoopCreated, error)
 }
 
 func NewPoopInteractor(r repository.PoopRepository, p presenter.PoopPresenter, d repository.DBRepository) PoopInteractor {
 	return &poopInteractor{r, p, d}
+}
+
+func (pi *poopInteractor) Create(p *model.Poop) (*dto.PoopCreated, error) {
+	data, err := pi.DBRepository.Transaction(func(i interface{}) (interface{}, error) {
+		return pi.PoopRepository.Create(p)
+	})
+
+	poop, ok := data.(*model.Poop)
+
+	if !ok {
+		return nil, errors.New("cast error")
+	}
+
+	if !errors.Is(err, nil) {
+		return nil, err
+	}
+	return pi.PoopPresenter.PoopCreated(poop), nil
 }

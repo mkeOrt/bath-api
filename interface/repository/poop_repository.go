@@ -1,6 +1,9 @@
 package repository
 
 import (
+	"errors"
+
+	"github.com/mkeort/bath-hexagonal/domain/model"
 	"github.com/mkeort/bath-hexagonal/usecase/repository"
 	"gorm.io/gorm"
 )
@@ -11,4 +14,12 @@ type poopRepository struct {
 
 func NewPoopRepository(db *gorm.DB) repository.PoopRepository {
 	return &poopRepository{db}
+}
+
+func (pr *poopRepository) Create(p *model.Poop) (*model.Poop, error) {
+	if err := pr.db.Create(p).Error; !errors.Is(err, nil) {
+		return nil, err
+	}
+
+	return p, nil
 }

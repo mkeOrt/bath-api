@@ -19,7 +19,8 @@ func NewRegistry(db *gorm.DB) Registry {
 
 func (r *registry) NewAppController() controller.AppController {
 	return controller.AppController{
-		User: r.NewUserController(),
-		Poop: r.NewPoopController(),
+		Middleware: controller.NewAppMiddleware(r.db),
+		User:       r.NewUserController(),
+		Poop:       r.NewPoopController(),
 	}
 }

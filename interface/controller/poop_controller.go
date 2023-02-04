@@ -1,7 +1,11 @@
 package controller
 
 import (
+	"errors"
+
 	"github.com/gofiber/fiber/v2"
+	"github.com/mkeort/bath-hexagonal/domain/dto"
+	"github.com/mkeort/bath-hexagonal/domain/model"
 	"github.com/mkeort/bath-hexagonal/usecase/interactor"
 )
 
@@ -18,5 +22,24 @@ func NewPoopController(us interactor.PoopInteractor) PoopController {
 }
 
 func (uc *poopController) Create(c *fiber.Ctx) error {
-	return c.JSON(c.Locals("UserId"))
+	var np dto.NewPoop
+	if err := c.BodyParser(&np); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	if errs := dto.ValidateStruct(np); errs != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errs)
+
+	}
+
+	user := c.Locals("User").(model.User)
+
+	cp, err := uc.poopInteractor.Create(np.ToPoop(model.User(user)))
+	if !errors.Is(err, nil) {
+		return c.Status(fiber.StatusBadRequest).JSON(err.Error())
+	}
+
+	return c.JSON(cp)
 }
