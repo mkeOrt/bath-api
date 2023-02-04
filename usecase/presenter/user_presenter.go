@@ -7,4 +7,5 @@ import (
 
 type UserPresenter interface {
 	ResponseUser(u *model.User) *dto.User
+	ResponseLoggedIn(u *model.User) (*dto.LoggedIn, error)
 }

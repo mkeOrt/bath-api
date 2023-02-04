@@ -23,3 +23,13 @@ func (ur *userRepository) Create(u *model.User) (*model.User, error) {
 
 	return u, nil
 }
+
+func (ur *userRepository) FindByEmail(e string) (*model.User, error) {
+	var u model.User
+
+	if err := ur.db.Where("email = ?", e).First(&u).Error; !errors.Is(err, nil) {
+		return nil, errors.New("credentials don't match")
+	}
+
+	return &u, nil
+}

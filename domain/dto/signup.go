@@ -1,8 +1,6 @@
 package dto
 
 import (
-	"fmt"
-
 	"github.com/mkeort/bath-hexagonal/domain/model"
 )
 
@@ -15,15 +13,5 @@ type SignUp struct {
 }
 
 func (s *SignUp) ToUser() (*model.User, error) {
-	hash, err := GenerateFromPassword(s.Password)
-	if err != nil {
-		return nil, fmt.Errorf("error encrypting password")
-	}
-
-	return &model.User{
-		Name:     s.Name,
-		Lastname: s.Lastname,
-		Email:    s.Email,
-		Password: hash,
-	}, nil
+	return model.NewUser(s.Name, s.Lastname, s.Email, s.Password)
 }

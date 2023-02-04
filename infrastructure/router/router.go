@@ -9,4 +9,5 @@ func NewRouter(a fiber.Router, c controller.AppController) {
 	users := a.Group("/users")
 
 	users.Post("sign-up", c.User.SignUp)
+	users.Post("log-in", c.User.LogIn)
 }

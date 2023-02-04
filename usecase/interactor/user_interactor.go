@@ -17,6 +17,7 @@ type userInteractor struct {
 
 type UserInteractor interface {
 	Create(u *model.User) (*dto.User, error)
+	LogIn(l *dto.LogIn) (*dto.LoggedIn, error)
 }
 
 func NewUserInteractor(r repository.UserRepository, p presenter.UserPresenter, d repository.DBRepository) UserInteractor {
@@ -39,4 +40,17 @@ func (us *userInteractor) Create(u *model.User) (*dto.User, error) {
 	}
 
 	return us.UserPresenter.ResponseUser(user), nil
+}
+
+func (us *userInteractor) LogIn(l *dto.LogIn) (*dto.LoggedIn, error) {
+	user, err := us.UserRepository.FindByEmail(l.Email)
+	if err != nil {
+		return nil, err
+	}
+	isValidPassword := user.ValidatePassword(l.Password)
+	if !isValidPassword {
+		return nil, errors.New("credentials don't match")
+	}
+
+	return us.UserPresenter.ResponseLoggedIn(user)
 }

@@ -19,3 +19,7 @@ func (*userPresenter) ResponseUser(us *model.User) *dto.User {
 		Email:    us.Email,
 	}
 }
+
+func (*userPresenter) ResponseLoggedIn(us *model.User) (*dto.LoggedIn, error) {
+	return dto.NewLoggedIn(us)
+}

@@ -14,6 +14,7 @@ type userController struct {
 
 type UserController interface {
 	SignUp(c *fiber.Ctx) error
+	LogIn(c *fiber.Ctx) error
 }
 
 func NewUserController(us interactor.UserInteractor) UserController {
@@ -44,4 +45,25 @@ func (uc *userController) SignUp(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(err.Error())
 	}
 	return c.Status(fiber.StatusCreated).JSON(u)
+}
+
+func (uc *userController) LogIn(c *fiber.Ctx) error {
+	var logIn dto.LogIn
+	if err := c.BodyParser(&logIn); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	errs := dto.ValidateStruct(logIn)
+	if errs != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errs)
+
+	}
+
+	user, err := uc.userInteractor.LogIn(&logIn)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(err.Error())
+	}
+	return c.JSON(user)
 }
