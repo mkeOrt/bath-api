@@ -2,8 +2,8 @@ package datastore
 
 import (
 	"fmt"
-	"os"
 
+	"github.com/mkeort/bath-hexagonal/config"
 	"github.com/mkeort/bath-hexagonal/domain/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -12,9 +12,9 @@ import (
 func NewDB() *gorm.DB {
 	dsn := fmt.Sprintf(
 		"host=bath-database user=%s password=%s dbname=%s port=5432 sslmode=disable TimeZone=America/Mexico_City",
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_NAME"),
+		config.C.Database.User,
+		config.C.Database.Password,
+		config.C.Database.Name,
 	)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})

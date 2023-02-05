@@ -2,11 +2,11 @@ package controller
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/mkeort/bath-hexagonal/config"
 	"github.com/mkeort/bath-hexagonal/domain/model"
 	"gorm.io/gorm"
 )
@@ -37,7 +37,7 @@ func (uc *authMiddleware) RequiredAuth(c *fiber.Ctx) error {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return []byte(os.Getenv("JWT_SECRET_KEY")), nil
+		return []byte(config.C.JWT.SecretKey), nil
 	})
 
 	if err != nil {

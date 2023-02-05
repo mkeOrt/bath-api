@@ -11,7 +11,15 @@ type config struct {
 		Port int
 	}
 	Database struct {
-		Name string
+		Name     string
+		User     string
+		Password string
+	}
+	JWT struct {
+		SecretKey string
+	}
+	BCrypt struct {
+		Cost int
 	}
 }
 
@@ -23,12 +31,29 @@ func ReadConfig() {
 		log.Panic("error reading env variables")
 	}
 
+	bcryptCost, err := strconv.Atoi(os.Getenv("B_CRYPT_COST"))
+	if err != nil {
+		log.Panic("error reading env variables")
+	}
+
 	C = config{
 		Server: struct{ Port int }{
 			Port: port,
 		},
-		Database: struct{ Name string }{
-			Name: os.Getenv("DATABASE_NAME") + ".sqlite",
+		Database: struct {
+			Name     string
+			User     string
+			Password string
+		}{
+			Name:     os.Getenv("DB_NAME"),
+			User:     os.Getenv("DB_USER"),
+			Password: os.Getenv("DB_PASSWORD"),
+		},
+		JWT: struct{ SecretKey string }{
+			os.Getenv("JWT_SECRET_KEY"),
+		},
+		BCrypt: struct{ Cost int }{
+			Cost: bcryptCost,
 		},
 	}
 }

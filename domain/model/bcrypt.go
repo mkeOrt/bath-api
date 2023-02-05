@@ -1,20 +1,12 @@
 package model
 
 import (
-	"fmt"
-	"os"
-	"strconv"
-
+	"github.com/mkeort/bath-hexagonal/config"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func GenerateFromPassword(password string) (string, error) {
-	cost, err := strconv.Atoi(os.Getenv("B_CRYPT_COST"))
-	if err != nil {
-		return "", fmt.Errorf("error encrypting data")
-	}
-
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), cost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), config.C.BCrypt.Cost)
 	return string(hash), err
 }
 
