@@ -23,3 +23,12 @@ func (pr *poopRepository) Create(p *model.Poop) (*model.Poop, error) {
 
 	return p, nil
 }
+
+func (pr *poopRepository) GetAll() ([]model.Poop, error) {
+	var poops []model.Poop
+	if err := pr.db.Find(&poops).Error; !errors.Is(err, nil) {
+		return nil, err
+	}
+
+	return poops, nil
+}

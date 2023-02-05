@@ -49,7 +49,7 @@ func (uc *authMiddleware) RequiredAuth(c *fiber.Ctx) error {
 		if err := uc.DB.First(&user, fmt.Sprintf("%v", claims["user_id"])).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON("Error reading user")
 		}
-		fmt.Println(user)
+
 		c.Locals("User", user)
 	} else {
 		return c.Status(fiber.StatusUnauthorized).JSON("Error reading token")
