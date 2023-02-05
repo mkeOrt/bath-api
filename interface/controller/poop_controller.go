@@ -16,6 +16,7 @@ type poopController struct {
 type PoopController interface {
 	Create(c *fiber.Ctx) error
 	GetAll(c *fiber.Ctx) error
+	GetMine(c *fiber.Ctx) error
 }
 
 func NewPoopController(us interactor.PoopInteractor) PoopController {
@@ -47,6 +48,17 @@ func (uc *poopController) Create(c *fiber.Ctx) error {
 
 func (uc *poopController) GetAll(c *fiber.Ctx) error {
 	poops, err := uc.poopInteractor.GetAll()
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(err.Error())
+	}
+
+	return c.JSON(poops)
+}
+
+func (uc *poopController) GetMine(c *fiber.Ctx) error {
+	user := c.Locals("User").(model.User)
+	poops, err := uc.poopInteractor.GetMine(user.ID)
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(err.Error())

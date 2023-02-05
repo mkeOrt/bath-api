@@ -32,3 +32,12 @@ func (pr *poopRepository) GetAll() ([]model.Poop, error) {
 
 	return poops, nil
 }
+
+func (pr *poopRepository) GetMine(ui uint) ([]model.Poop, error) {
+	var poops []model.Poop
+	if err := pr.db.Where("user_id = ?", ui).Find(&poops).Error; !errors.Is(err, nil) {
+		return nil, err
+	}
+
+	return poops, nil
+}

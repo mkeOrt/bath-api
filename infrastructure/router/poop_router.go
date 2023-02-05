@@ -8,4 +8,5 @@ import (
 func NewPoopRouter(r fiber.Router, c controller.AppController) {
 	r.Post("create", c.Poop.Create)
 	r.Get("get-all", c.Poop.GetAll)
+	r.Get("get-mine", c.Poop.GetMine)
 }
