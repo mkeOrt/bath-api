@@ -5,8 +5,8 @@ import "github.com/mkeort/bath-hexagonal/domain/model"
 type NewPoop struct {
 	Title       string `json:"title" validate:"required"`
 	Description string `json:"description" gorm:"default:null"`
-	Latitude    string `json:"latitude" validate:"required"`
-	Longitude   string `json:"Longitude" validate:"required"`
+	Latitude    string `json:"latitude" validate:"required,latitude"`
+	Longitude   string `json:"Longitude" validate:"required,longitude"`
 }
 
 func (np *NewPoop) ToPoop(user model.User) *model.Poop {
