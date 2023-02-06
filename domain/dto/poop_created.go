@@ -5,5 +5,5 @@ type PoopCreated struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Latitude    string `json:"latitude"`
-	Longitude   string `json:"Longitude"`
+	Longitude   string `json:"longitude"`
 }
