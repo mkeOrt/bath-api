@@ -26,7 +26,7 @@ func (pr *poopRepository) Create(p *model.Poop) (*model.Poop, error) {
 
 func (pr *poopRepository) GetAll() ([]model.Poop, error) {
 	var poops []model.Poop
-	if err := pr.db.Find(&poops).Error; !errors.Is(err, nil) {
+	if err := pr.db.Joins("User").Find(&poops).Error; !errors.Is(err, nil) {
 		return nil, err
 	}
 

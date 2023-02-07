@@ -17,7 +17,7 @@ type poopInteractor struct {
 
 type PoopInteractor interface {
 	Create(p *model.Poop) (*dto.PoopCreated, error)
-	GetAll() ([]dto.PoopCreated, error)
+	GetAll() ([]dto.PoopCreatedWithUser, error)
 	GetMine(ui uint) ([]dto.PoopCreated, error)
 }
 
@@ -42,14 +42,14 @@ func (pi *poopInteractor) Create(p *model.Poop) (*dto.PoopCreated, error) {
 	return pi.PoopPresenter.PoopCreated(poop), nil
 }
 
-func (pi *poopInteractor) GetAll() ([]dto.PoopCreated, error) {
+func (pi *poopInteractor) GetAll() ([]dto.PoopCreatedWithUser, error) {
 	poops, err := pi.PoopRepository.GetAll()
 
 	if err != nil {
 		return nil, errors.New("error getting poops")
 	}
 
-	return pi.PoopPresenter.PoopsCreated(poops), nil
+	return pi.PoopPresenter.PoopsCreatedWithUser(poops), nil
 }
 
 func (pi *poopInteractor) GetMine(ui uint) ([]dto.PoopCreated, error) {

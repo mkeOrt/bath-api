@@ -8,4 +8,5 @@ import (
 type PoopPresenter interface {
 	PoopCreated(p *model.Poop) *dto.PoopCreated
 	PoopsCreated(poops []model.Poop) []dto.PoopCreated
+	PoopsCreatedWithUser(poops []model.Poop) []dto.PoopCreatedWithUser
 }
