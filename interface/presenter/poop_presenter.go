@@ -32,6 +32,7 @@ func (*poopPresenter) PoopsCreated(poops []model.Poop) []dto.PoopCreated {
 			Description: p.Description,
 			Latitude:    p.Latitude,
 			Longitude:   p.Longitude,
+			LastUpdate:  p.UpdatedAt,
 		})
 	}
 
