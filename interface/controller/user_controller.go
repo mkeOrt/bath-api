@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/mkeort/bath-hexagonal/domain/dto"
+	"github.com/mkeort/bath-hexagonal/domain/model"
 	"github.com/mkeort/bath-hexagonal/usecase/interactor"
 )
 
@@ -15,6 +16,7 @@ type userController struct {
 type UserController interface {
 	SignUp(c *fiber.Ctx) error
 	LogIn(c *fiber.Ctx) error
+	GetUser(c *fiber.Ctx) error
 }
 
 func NewUserController(us interactor.UserInteractor) UserController {
@@ -66,4 +68,9 @@ func (uc *userController) LogIn(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(err.Error())
 	}
 	return c.JSON(user)
+}
+
+func (uc *userController) GetUser(c *fiber.Ctx) error {
+	user := c.Locals("User").(model.User)
+	return c.JSON(uc.userInteractor.GetMe(&user))
 }

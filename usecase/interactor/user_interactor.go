@@ -18,6 +18,7 @@ type userInteractor struct {
 type UserInteractor interface {
 	Create(u *model.User) (*dto.User, error)
 	LogIn(l *dto.LogIn) (*dto.LoggedIn, error)
+	GetMe(u *model.User) *dto.User
 }
 
 func NewUserInteractor(r repository.UserRepository, p presenter.UserPresenter, d repository.DBRepository) UserInteractor {
@@ -53,4 +54,8 @@ func (us *userInteractor) LogIn(l *dto.LogIn) (*dto.LoggedIn, error) {
 	}
 
 	return us.UserPresenter.ResponseLoggedIn(user)
+}
+
+func (ui *userInteractor) GetMe(u *model.User) *dto.User {
+	return ui.UserPresenter.ResponseUser(u)
 }

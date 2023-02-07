@@ -14,6 +14,7 @@ func NewUserPresenter() presenter.UserPresenter {
 
 func (*userPresenter) ResponseUser(us *model.User) *dto.User {
 	return &dto.User{
+		ID:       us.ID,
 		Name:     us.Name,
 		Lastname: us.Lastname,
 		Email:    us.Email,
