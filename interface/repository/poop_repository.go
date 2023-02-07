@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/mkeort/bath-hexagonal/domain/model"
+	"github.com/mkeort/bath-hexagonal/infrastructure/datastore"
 	"github.com/mkeort/bath-hexagonal/usecase/repository"
 	"gorm.io/gorm"
 )
@@ -24,13 +25,22 @@ func (pr *poopRepository) Create(p *model.Poop) (*model.Poop, error) {
 	return p, nil
 }
 
-func (pr *poopRepository) GetAll() ([]model.Poop, error) {
+func (pr *poopRepository) GetAll(pageSize, page int) ([]model.Poop, error) {
 	var poops []model.Poop
-	if err := pr.db.Joins("User").Find(&poops).Error; !errors.Is(err, nil) {
+
+	if err := pr.db.Scopes(datastore.Paginate(pageSize, page)).Joins("User").Find(&poops).Error; !errors.Is(err, nil) {
 		return nil, err
 	}
 
 	return poops, nil
+}
+
+func (pr *poopRepository) GetAllCount() (*int64, error) {
+	var count int64
+	if err := pr.db.Model(&model.Poop{}).Count(&count).Error; err != nil {
+		return nil, errors.New("error getting poops amount")
+	}
+	return &count, nil
 }
 
 func (pr *poopRepository) GetMine(ui uint) ([]model.Poop, error) {

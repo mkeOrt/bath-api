@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/mkeort/bath-hexagonal/domain/dto"
@@ -47,7 +48,19 @@ func (uc *poopController) Create(c *fiber.Ctx) error {
 }
 
 func (uc *poopController) GetAll(c *fiber.Ctx) error {
-	poops, err := uc.poopInteractor.GetAll()
+	pageSize := c.Query("page_size", "10")
+	intPageSize, err := strconv.Atoi(pageSize)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON("page_size should be a valid number")
+	}
+
+	page := c.Query("page", "1")
+	intPage, err := strconv.Atoi(page)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON("page should be a valid number")
+	}
+
+	poops, err := uc.poopInteractor.GetAll(intPageSize, intPage)
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(err.Error())

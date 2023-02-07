@@ -2,6 +2,7 @@ package interactor
 
 import (
 	"errors"
+	"math"
 
 	"github.com/mkeort/bath-hexagonal/domain/dto"
 	"github.com/mkeort/bath-hexagonal/domain/model"
@@ -17,7 +18,7 @@ type poopInteractor struct {
 
 type PoopInteractor interface {
 	Create(p *model.Poop) (*dto.PoopCreated, error)
-	GetAll() ([]dto.PoopCreatedWithUser, error)
+	GetAll(pageSize, page int) (*dto.PaginatedPoopsWithUser, error)
 	GetMine(ui uint) ([]dto.PoopCreated, error)
 }
 
@@ -42,14 +43,41 @@ func (pi *poopInteractor) Create(p *model.Poop) (*dto.PoopCreated, error) {
 	return pi.PoopPresenter.PoopCreated(poop), nil
 }
 
-func (pi *poopInteractor) GetAll() ([]dto.PoopCreatedWithUser, error) {
-	poops, err := pi.PoopRepository.GetAll()
+func (pi *poopInteractor) GetAll(pageSize, page int) (*dto.PaginatedPoopsWithUser, error) {
+	cPoops := make(chan *[]model.Poop)
+	cCountPoops := make(chan *int64)
+	go func() {
+		poopsCount, err := pi.PoopRepository.GetAllCount()
+		if err != nil {
+			cPoops <- nil
+		}
+		cCountPoops <- poopsCount
+	}()
 
-	if err != nil {
+	go func() {
+		poops, err := pi.PoopRepository.GetAll(pageSize, page)
+		if err != nil {
+			cPoops <- nil
+		}
+		cPoops <- &poops
+	}()
+
+	poops := <-cPoops
+	countPoops := <-cCountPoops
+
+	if poops == nil || countPoops == nil {
 		return nil, errors.New("error getting poops")
 	}
 
-	return pi.PoopPresenter.PoopsCreatedWithUser(poops), nil
+	pp := dto.PaginatedPoopsWithUser{
+		Count:       *countPoops,
+		Page:        page,
+		PageSize:    pageSize,
+		PagesAmount: int(math.Ceil(float64(*countPoops) / float64(pageSize))),
+		Poops:       pi.PoopPresenter.PoopsCreatedWithUser(*poops),
+	}
+
+	return &pp, nil
 }
 
 func (pi *poopInteractor) GetMine(ui uint) ([]dto.PoopCreated, error) {
