@@ -17,6 +17,7 @@ type UserController interface {
 	SignUp(c *fiber.Ctx) error
 	LogIn(c *fiber.Ctx) error
 	GetUser(c *fiber.Ctx) error
+	PutUser(c *fiber.Ctx) error
 }
 
 func NewUserController(us interactor.UserInteractor) UserController {
@@ -73,4 +74,26 @@ func (uc *userController) LogIn(c *fiber.Ctx) error {
 func (uc *userController) GetUser(c *fiber.Ctx) error {
 	user := c.Locals("User").(model.User)
 	return c.JSON(uc.userInteractor.GetMe(&user))
+}
+
+func (uc *userController) PutUser(c *fiber.Ctx) error {
+	user := c.Locals("User").(model.User)
+
+	var nu dto.UpdateUser
+	if err := c.BodyParser(&nu); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON("Error reading data from request")
+	}
+
+	errs := dto.ValidateStruct(nu)
+	if errs != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(errs)
+
+	}
+
+	u, err := uc.userInteractor.Update(&user, &nu)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(err.Error())
+	}
+
+	return c.JSON(u)
 }

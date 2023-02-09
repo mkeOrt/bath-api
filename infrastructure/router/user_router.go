@@ -9,6 +9,7 @@ func NewUserRouter(r fiber.Router, c controller.AppController) {
 	middlewares := c.Middleware.GetAuthMiddlewares()
 
 	r.Get("me", middlewares.RequiredAuth, c.User.GetUser)
+	r.Put("me", middlewares.RequiredAuth, c.User.PutUser)
 	r.Post("sign-up", c.User.SignUp)
 	r.Post("log-in", c.User.LogIn)
 }

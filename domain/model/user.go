@@ -31,3 +31,12 @@ func NewUser(n, l, e, p string) (*User, error) {
 func (u *User) ValidatePassword(p string) bool {
 	return CompareHashAndPassword([]byte(u.Password), []byte(p))
 }
+
+func (u *User) CryptPassword(p string) error {
+	hash, err := GenerateFromPassword(p)
+	if err != nil {
+		return fmt.Errorf("error encrypting password")
+	}
+	u.Password = hash
+	return nil
+}

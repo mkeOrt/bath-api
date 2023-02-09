@@ -5,8 +5,8 @@ import (
 )
 
 type SignUp struct {
-	Name                 string `json:"name" validate:"required"`
-	Lastname             string `json:"lastname" validate:"required"`
+	Name                 string `json:"name" validate:"required,min=1"`
+	Lastname             string `json:"lastname" validate:"required,min=1"`
 	Email                string `json:"email" validate:"required,email"`
 	Password             string `json:"password" validate:"required,min=6"`
 	PasswordConfirmation string `json:"password-confirmation" validate:"required,eqcsfield=Password"`

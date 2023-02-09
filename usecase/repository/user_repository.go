@@ -8,4 +8,5 @@ type UserRepository interface {
 	GetById(uid int) (*model.User, error)
 	Create(u *model.User) (*model.User, error)
 	FindByEmail(e string) (*model.User, error)
+	Update(u, nu *model.User) (*model.User, error)
 }

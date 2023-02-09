@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"log"
 
 	"github.com/mkeort/bath-hexagonal/domain/model"
 	"github.com/mkeort/bath-hexagonal/usecase/repository"
@@ -41,4 +42,13 @@ func (ur *userRepository) FindByEmail(e string) (*model.User, error) {
 	}
 
 	return &u, nil
+}
+
+func (ur *userRepository) Update(u, nu *model.User) (*model.User, error) {
+	if err := ur.db.Model(&u).Updates(*nu).Error; err != nil {
+		log.Fatal(err)
+		return nil, errors.New("error updating user")
+	}
+
+	return u, nil
 }

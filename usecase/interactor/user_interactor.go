@@ -19,6 +19,7 @@ type UserInteractor interface {
 	Create(u *model.User) (*dto.User, error)
 	LogIn(l *dto.LogIn) (*dto.LoggedIn, error)
 	GetMe(u *model.User) *dto.User
+	Update(u *model.User, nu *dto.UpdateUser) (*dto.User, error)
 }
 
 func NewUserInteractor(r repository.UserRepository, p presenter.UserPresenter, d repository.DBRepository) UserInteractor {
@@ -58,4 +59,31 @@ func (us *userInteractor) LogIn(l *dto.LogIn) (*dto.LoggedIn, error) {
 
 func (ui *userInteractor) GetMe(u *model.User) *dto.User {
 	return ui.UserPresenter.ResponseUser(u)
+}
+
+func (ui *userInteractor) Update(u *model.User, nu *dto.UpdateUser) (*dto.User, error) {
+	newUser := model.User{
+		Name:     nu.Name,
+		Lastname: nu.Lastname,
+		Email:    nu.Email,
+	}
+	if err := newUser.CryptPassword(nu.Password); err != nil {
+		return nil, errors.New("error encrypting password")
+	}
+
+	data, err := ui.DBRepository.Transaction(func(i interface{}) (interface{}, error) {
+		return ui.UserRepository.Update(u, &newUser)
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	user, ok := data.(*model.User)
+
+	if !ok {
+		return nil, errors.New("cast error")
+	}
+
+	return ui.UserPresenter.ResponseUser(user), nil
 }
