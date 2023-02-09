@@ -43,11 +43,19 @@ func (pr *poopRepository) GetAllCount() (*int64, error) {
 	return &count, nil
 }
 
-func (pr *poopRepository) GetMine(ui uint) ([]model.Poop, error) {
+func (pr *poopRepository) GetMine(ui uint, pageSize, page int) ([]model.Poop, error) {
 	var poops []model.Poop
-	if err := pr.db.Where("user_id = ?", ui).Find(&poops).Error; !errors.Is(err, nil) {
+	if err := pr.db.Scopes(datastore.Paginate(pageSize, page)).Where("user_id = ?", ui).Find(&poops).Error; !errors.Is(err, nil) {
 		return nil, err
 	}
 
 	return poops, nil
+}
+
+func (pr *poopRepository) GetMineCount(ui uint) (*int64, error) {
+	var count int64
+	if err := pr.db.Where("user_id = ?", ui).Model(&model.Poop{}).Count(&count).Error; err != nil {
+		return nil, errors.New("error getting poops amount")
+	}
+	return &count, nil
 }

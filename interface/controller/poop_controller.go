@@ -70,8 +70,20 @@ func (uc *poopController) GetAll(c *fiber.Ctx) error {
 }
 
 func (uc *poopController) GetMine(c *fiber.Ctx) error {
+	pageSize := c.Query("page_size", "10")
+	intPageSize, err := strconv.Atoi(pageSize)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON("page_size should be a valid number")
+	}
+
+	page := c.Query("page", "1")
+	intPage, err := strconv.Atoi(page)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON("page should be a valid number")
+	}
+
 	user := c.Locals("User").(model.User)
-	poops, err := uc.poopInteractor.GetMine(user.ID)
+	poops, err := uc.poopInteractor.GetMine(user.ID, intPageSize, intPage)
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(err.Error())

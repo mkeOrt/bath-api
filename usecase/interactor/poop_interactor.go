@@ -19,7 +19,7 @@ type poopInteractor struct {
 type PoopInteractor interface {
 	Create(p *model.Poop) (*dto.PoopCreated, error)
 	GetAll(pageSize, page int) (*dto.PaginatedPoopsWithUser, error)
-	GetMine(ui uint) ([]dto.PoopCreated, error)
+	GetMine(ui uint, pageSize, page int) (*dto.PaginatedPoops, error)
 }
 
 func NewPoopInteractor(r repository.PoopRepository, p presenter.PoopPresenter, d repository.DBRepository) PoopInteractor {
@@ -80,12 +80,39 @@ func (pi *poopInteractor) GetAll(pageSize, page int) (*dto.PaginatedPoopsWithUse
 	return &pp, nil
 }
 
-func (pi *poopInteractor) GetMine(ui uint) ([]dto.PoopCreated, error) {
-	poops, err := pi.PoopRepository.GetMine(ui)
+func (pi *poopInteractor) GetMine(ui uint, pageSize, page int) (*dto.PaginatedPoops, error) {
+	cPoops := make(chan *[]model.Poop)
+	cCountPoops := make(chan *int64)
 
-	if err != nil {
+	go func() {
+		poops, err := pi.PoopRepository.GetMine(ui, pageSize, page)
+		if err != nil {
+			cPoops <- nil
+		}
+		cPoops <- &poops
+	}()
+	go func() {
+		poopsCount, err := pi.PoopRepository.GetMineCount(ui)
+		if err != nil {
+			cPoops <- nil
+		}
+		cCountPoops <- poopsCount
+	}()
+
+	poops := <-cPoops
+	countPoops := <-cCountPoops
+
+	if poops == nil || countPoops == nil {
 		return nil, errors.New("error getting poops")
 	}
 
-	return pi.PoopPresenter.PoopsCreated(poops), nil
+	pp := dto.PaginatedPoops{
+		Count:       *countPoops,
+		Page:        page,
+		PageSize:    pageSize,
+		PagesAmount: int(math.Ceil(float64(*countPoops) / float64(pageSize))),
+		Poops:       pi.PoopPresenter.PoopsCreated(*poops),
+	}
+
+	return &pp, nil
 }
